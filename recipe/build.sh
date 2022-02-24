@@ -20,13 +20,14 @@ cat <<EOT >> patch.py
 from pathlib import Path
 import re
 
-for header_file in Path('cmake/external/eigen').rglob('*PacketMath.h'):
+for header_file in Path("cmake/external/eigen").rglob("*PacketMath.h"):
     file_content = header_file.open().read()
     with header_file.open("w") as fh:
-        file_content = re.sub("HasExp[ ]*\=[ ]*1", "HasExp = EIGEN_FAST_MATH", file_content)
-        file_content = re.sub("HasLog[ ]*\=[ ]*1", "HasLog = EIGEN_FAST_MATH", file_content)
-        file_content = re.sub("HasLog1p[ ]*\=[ ]*1", "HasLog1p = EIGEN_FAST_MATH", file_content)
-        file_content = re.sub("HasExpm1[ ]*\=[ ]*1", "HasExpm1 = EIGEN_FAST_MATH", file_content)
+        for op in ["HasExp", "HasLog", "HasLog1p", "HasExpm1"]:
+            file_content = re.sub(
+                f"{op}[ ]*\=[ ]*1", f"{op} = EIGEN_FAST_MATH", file_content
+            )
+
         fh.write(file_content)
 EOT
 python patch.py
